@@ -65,16 +65,43 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   float vx = x_(2);
   float vy = x_(3);
     
+  //check division by zero
+  if(fabs(px) < .00001) {
+    px += .001;
+  }
+
+ //check division by zero 
+ if(fabs(py) < .00001) {
+    py += .001;
+  }
+
   // Equations for h_func below
   float eq1 = sqrt(px * px + py * py);
+
+  
   //check division by zero
   if(eq1 < .00001) {
-    px += .001;
-    py += .001;
-    eq1 = sqrt(px * px + py * py);
+    eq1 = .0001;
   }
+  
   float eq2 = atan2(py,px);
+  
+  while (eq2 < -M_PI) {
+		//cout << "checkPIValue" << endl;
+		eq2 += 2 * M_PI;
+	}
+	while (eq2 > M_PI) {
+		//cout << "checkPIValue" << endl;
+		eq2 -= 2 * M_PI;
+	}
+
+	if (eq2 > M_PI || eq2 < -M_PI) {
+		// cout << "Error" << endl;
+	}
+  
   float eq3 = (px*vx+py*vy)/eq1;
+    
+  
     
   //Feed in equations above
   VectorXd H_func(3);
